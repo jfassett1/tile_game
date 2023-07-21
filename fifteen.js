@@ -49,6 +49,8 @@ function reset_puzzle() {
 			tile.style.backgroundPositionY = (i * -100) + "px";
 			// Display the tile number.
 			tile.innerHTML = n++;
+			// Set the tile's background image to the selected option.
+			set_background(tile);
 			// Add the tile to the puzzle.
 			puzzle.append(tile);
 		}
@@ -62,24 +64,49 @@ function reset_puzzle() {
 
 // Move the tile to the blank space.
 function move_tile(tile) {
+	const tile_id = tile.id.split("-");
 	if (!shuffling) {
 		// Do not move the tile if the puzzle is not clickable.
 		if (!clickable) return;
 		// Do not move the tile if it is not movable.
 		if (!tile.classList.contains("movable")) return;
+		// Store the "to" and "from" positions.
+		const from_x = parseInt(tile_id[0]);
+		const from_y = parseInt(tile_id[1]);
+		const to_x = blank_x;
+		const to_y = blank_y;
+		// Make the puzzle not clickable during the animation.
+		clickable = false;
+		// Move the tile with animation.
+		let pos = 0;
+		const id = setInterval(function() {
+			// Stop the animation after moving the tile 100 pixels.
+			if (pos == 100) {
+				clickable = true;
+				clearInterval(id);
+			} else {
+				// Move the tile 10 pixels per frame.
+				pos += 10; 
+				tile.style.left = ((100 - pos) * from_x) + (pos * to_x) + "px";
+				tile.style.top = ((100 - pos) * from_y) + (pos * to_y) + "px";
+			}
+		// Each frame lasts for 10 milliseconds.
+		}, 10);
+	} else {
+		// Move the tile without animation.
+		tile.style.left = (100 * blank_x) + "px";
+		tile.style.top = (100 * blank_y) + "px";
 	}
-	// Move the tile.
-	tile.style.left = (blank_x * 100) + "px";
-	tile.style.top = (blank_y * 100) + "px";
 	// Swap the positions of the tile and blank space.
-	const temp = tile.id.split("-");
 	tile.id = blank_x + "-" + blank_y;
-	blank_x = parseInt(temp[0]);
-	blank_y = parseInt(temp[1]);
-	// If the blank space is in the bottom right corner, check whether the puzzle is solved.
-	if (!shuffling && blank_x == 3 && blank_y == 3) check_puzzle();
-	// Make the tiles adjacent to the blank space movable.
-	if (!shuffling) set_movable_tiles();
+	blank_x = parseInt(tile_id[0]);
+	blank_y = parseInt(tile_id[1]);
+	if (!shuffling) {
+		// If the blank space is in the bottom right corner, check whether the puzzle is solved.
+		if (blank_x == 3 && blank_y == 3) check_puzzle();
+		// Make the tiles adjacent to the blank space movable.
+		set_movable_tiles();
+	}
 }
 
 // Make the tiles adjacent to the blank space movable.
@@ -145,6 +172,15 @@ function check_puzzle() {
 		}
 	}
 	// If the check passed, the puzzle is solved.
-	clickable = false;
+	reset_puzzle();
 	// Do something here.
+}
+
+// Helper function to integrate with backgroundFeature.js.
+function set_background(tile) {
+	const select_box = document.getElementById("backgroundSelect");
+	if (select_box != null) {
+		const index = select_box.selectedIndex;
+		tile.style.backgroundImage = "url('background" + (index + 1) + ".jpg')";
+	}
 }
