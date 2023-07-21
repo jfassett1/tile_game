@@ -112,6 +112,7 @@ function get_adjacent_tiles() {
 
 // Shuffle the puzzle in a way that is solvable.
 function shuffle_puzzle() {
+	reset_puzzle();
 	shuffling = true;
 	// Move a random tile N times.
 	const N = 1000;
