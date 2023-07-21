@@ -1,6 +1,8 @@
 body {
 	font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 	text-align: center;
+	color: #fff;
+	background-image: url(pattern.png)
 }
 #puzzle {
 	width: 400px;
@@ -18,19 +20,18 @@ body {
 	border-radius: 5px;
 	font-size: 32px;
 	font-weight: bold;
-	color: #fff;
-	-webkit-text-stroke-width: 1px;
-	-webkit-text-stroke-color: #ddd;
+	text-shadow: 1px 1px 2px #000;
 	position: absolute;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background-image: url("background.jpg");
 }
 .movable:hover {
 	border: 2px solid red;
 	color: #008800;
-	-webkit-text-stroke-color: #00cc00;
 	text-decoration: underline;
 	cursor: pointer;
+}
+#buttons {
+	margin-top: 20px;
 }
