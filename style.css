@@ -22,8 +22,8 @@ body {
 	-webkit-text-stroke-width: 1px;
 	-webkit-text-stroke-color: #ddd;
 	position: absolute;
-	display : flex;
-	align-items : center;
+	display: flex;
+	align-items: center;
 	justify-content: center;
 	background-image: url("background.jpg");
 }
