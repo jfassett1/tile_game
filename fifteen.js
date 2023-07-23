@@ -65,7 +65,7 @@ function cheat(){
 		move_tile(j);
 		prev = j;
 	},
-	100 * i);
+	130 * i);
 	}
 		
 }
@@ -210,7 +210,7 @@ function move_tile(tile) {
 				tile.style.left = ((100 - pos) * from_x) + (pos * to_x) + "px";
 				tile.style.top = ((100 - pos) * from_y) + (pos * to_y) + "px";
 			}
-		// Each frame lasts for 10 milliseconds.
+		// Each frame lasts for 5 milliseconds.
 		}, 5);
 	} else {
 		// Move the tile without animation.
