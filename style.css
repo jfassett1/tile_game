@@ -35,3 +35,13 @@ body {
 #buttons {
 	margin-top: 20px;
 }
+.final{
+	border:solid purple 2px;
+	background-color: aqua;
+	color:purple;
+	width:fit-content;
+	margin:auto;
+	font-family:Comic Georgia, 'Times New Roman', Times, serif;
+	padding:2%;
+	
+	}

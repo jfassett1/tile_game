@@ -22,6 +22,11 @@ let adjacent_tiles;
 let in_progress = 0;
 //Variable for audio element
 let song = document.getElementById("song");
+let timer = document.getElementById("timer");
+let interval = null;
+let endscreen = document.getElementById("end");
+
+
 
 // Show the puzzle.
 reset_puzzle();
@@ -29,35 +34,54 @@ reset_puzzle();
 
 
 function start(){
+	puzzle.style.display = "block";
+	restart();
 	if(in_progress){
 		return;
 	}
 	//Delays start of game by three seconds
 	setTimeout(function(){
 		shuffle_puzzle();
-		countdown(120);
+		countdown(300);
 		song.play();
 	},3000);
 	in_progress = 1;
 }
+
 function results(cond){
-	song.stop();
-if(cond == "Y"){
-	//win condition
+	puzzle.style.display = "none";
+	clickable = false;
+	song.pause();
+	song.currentTime = 0;
+	endscreen.classList.add("final");
+	//winner
+	if(cond == "W"){
+		clearInterval(interval);
+		let winimage = document.createElement("img");
+		winimage.src = "win.jpg";
+	   // let h3 = document.createElement("h3");
+	   // h3.innerHTML = "YOU WON!!!";
+		endscreen.appendChild(winimage);
+		return;
+	
+	}
+	//lose
+	else{
+	   // let h3 = document.createElement("h3");
+		let loseimage = document.createElement("img");
+		loseimage.src = "lose.png";
+	   // h3.innerHTML = "YOU LOST";
+	   // endscreen.appendChild(h3);
+		endscreen.appendChild(loseimage);
+		return;
+	}
 }
-else{
-	//lose condition
-}
-
-}
-
 function countdown(length){
 	if(length === "quit"){
 	 clearInterval(interval);
 		 return;
 	 }
 	 //let length = 5;
-	 let timer = document.getElementById("timer");
 		 interval = setInterval(function() {
 		 timer.innerHTML = "Time Remaining: " + String(length);
 		 length -= 1;
@@ -68,6 +92,17 @@ function countdown(length){
 	   }, 1000);
 	   return;
 	}
+function restart(){
+	in_progress = 0;
+	song.pause();
+	song.currentTime = 0;
+	timer.innerHTML = "";
+	endscreen.classList.remove("final");
+	endscreen.innerHTML = "";
+	countdown("quit");
+
+
+}
 // Show the tiles in the initial (solved) state.
 function reset_puzzle() {
 	// Clear any existing tiles.
@@ -219,7 +254,7 @@ function check_puzzle() {
 	}
 	// If the check passed, the puzzle is solved.
 	reset_puzzle();
-	// Do something here.
+	results("W");
 }
 
 // Helper function to integrate with backgroundFeature.js.
