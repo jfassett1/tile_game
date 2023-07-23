@@ -1,28 +1,40 @@
+<!--
+	Extra features implemented (5):
+	- End-of-game notification
+	- Transitions (when moving tiles)
+	- Game time with some music file
+	- Multiple backgrounds
+	- Cheat button
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
 		<title>Sliding Block Puzzle</title>
 		<link rel="stylesheet" href="style.css">
+		<audio src="Ultimate Battle.mp3" id="song" loop></audio>
 	</head>
 	<body>
-		<audio src = "Ultimate Battle.mp3" id = "song" loop></audio>
 		<h1>Sliding Block Puzzle</h1>
-		<h3 id = "timer"></h3>
-		<h3 id = "movetracker"></h3>
-		<div id = "end"></div>
-
+		
+		<!-- div for the end screen -->
+		<div id="end"></div>
+		
 		<!-- Puzzle -->
 		<div id="puzzle"></div>
 		
 		<!-- Buttons -->
 		<div id="buttons">
-			<button id="shuffle" onclick = "start()">Shuffle</button>
+			<button id="shuffle">Shuffle</button>
 			<button id="reset">Reset</button>
-			<button id="cheat" onclick = "cheat()">Cheat</button>
-
+			<button id="cheat" onclick="cheat()">Cheat</button>
 		</div>
-
+		
+		<!-- Move counter and timer -->
+		<h3 id="movetracker"></h3>
+		<h3 id="timer"></h3>
+		
 		<!-- JavaScript -->
 		<script src="fifteen.js"></script>
 		<script src="backgroundFeature.js"></script>
