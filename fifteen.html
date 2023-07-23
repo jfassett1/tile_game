@@ -6,14 +6,17 @@
 		<link rel="stylesheet" href="style.css">
 	</head>
 	<body>
+		<audio src = "Ultimate Battle.mp3" id = "song"></audio>
 		<h1>Fifteen Puzzle</h1>
+		<br>
+		<h3 id = "timer"></h3>
 		
 		<!-- Puzzle -->
 		<div id="puzzle"></div>
 		
 		<!-- Buttons -->
 		<div id="buttons">
-			<button id="shuffle">Shuffle</button>
+			<button id="shuffle" onclick = "start()">Shuffle</button>
 			<button id="reset">Reset</button>
 		</div>
 		

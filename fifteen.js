@@ -2,8 +2,8 @@
 const puzzle = document.getElementById("puzzle");
 
 // Configure the "Shuffle" button.
-const shuffle = document.getElementById("shuffle");
-shuffle.addEventListener("click", function() {shuffle_puzzle()});
+//const shuffle = document.getElementById("shuffle");
+//shuffle.addEventListener("click", function() {start()});
 
 // Configure the "Reset" button.
 const reset = document.getElementById("reset");
@@ -18,10 +18,56 @@ let clickable;
 let shuffling;
 // Track the adjacent tiles as an array of ids.
 let adjacent_tiles;
+//Flag for whether game is in progress or not
+let in_progress = 0;
+//Variable for audio element
+let song = document.getElementById("song");
 
 // Show the puzzle.
 reset_puzzle();
 
+
+
+function start(){
+	if(in_progress){
+		return;
+	}
+	//Delays start of game by three seconds
+	setTimeout(function(){
+		shuffle_puzzle();
+		countdown(120);
+		song.play();
+	},3000);
+	in_progress = 1;
+}
+function results(cond){
+	song.stop();
+if(cond == "Y"){
+	//win condition
+}
+else{
+	//lose condition
+}
+
+}
+
+function countdown(length){
+	if(length === "quit"){
+	 clearInterval(interval);
+		 return;
+	 }
+	 //let length = 5;
+	 let timer = document.getElementById("timer");
+		 interval = setInterval(function() {
+		 timer.innerHTML = "Time Remaining: " + String(length);
+		 length -= 1;
+		 if (length < 0) {
+		   clearInterval(interval);
+			 results('L');
+		 }
+	   }, 1000);
+	   return;
+	}
 // Show the tiles in the initial (solved) state.
 function reset_puzzle() {
 	// Clear any existing tiles.
