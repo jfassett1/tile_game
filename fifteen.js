@@ -7,7 +7,7 @@ const puzzle = document.getElementById("puzzle");
 
 // Configure the "Reset" button.
 const reset = document.getElementById("reset");
-reset.addEventListener("click", function() {reset_puzzle()});
+reset.addEventListener("click", function() {restart()});
 
 // Track the blank space with x and y positions.
 let blank_x;
@@ -23,8 +23,12 @@ let in_progress = 0;
 //Variable for audio element
 let song = document.getElementById("song");
 let timer = document.getElementById("timer");
+//Interval for timer
 let interval = null;
 let endscreen = document.getElementById("end");
+let moves = 0;
+let cheatstack = [];
+let movetracker = document.getElementById("movetracker");
 
 
 
@@ -34,6 +38,7 @@ reset_puzzle();
 
 
 function start(){
+	cheating = 0;
 	puzzle.style.display = "block";
 	restart();
 	if(in_progress){
@@ -42,53 +47,79 @@ function start(){
 	//Delays start of game by three seconds
 	setTimeout(function(){
 		shuffle_puzzle();
-		countdown(300);
+		countdown(1);
 		song.play();
+		totalmoves("start");
 	},3000);
 	in_progress = 1;
-}
 
-function results(cond){
+}
+let cheating = 0;
+function cheat(){
+	cheating = 1;
+	let prev = 0;
+	for(let i = 0; i < cheatstack.length;i++){
+	setTimeout(function(){
+		j = cheatstack.pop();
+		move_tile(j);
+		prev = j;
+	},
+	300 * i);
+	}
+		
+}
+function totalmoves(parameter){
+	if(parameter == "start"){
+
+	movetracker.innerHTML = "Moves Made: " + String(moves);
+	}
+
+	else{
+	moves += parameter;
+	movetracker.innerHTML = "Moves Made: " + String(moves);
+	}
+
+}
+//End Screen function
+let displayed = 0;
+function results(){
+	if(displayed == 1){
+		return;
+	}
+	displayed = 1;
 	puzzle.style.display = "none";
 	clickable = false;
+	//Stops song
 	song.pause();
 	song.currentTime = 0;
+	//Adds the 'final' css class
 	endscreen.classList.add("final");
-	//winner
-	if(cond == "W"){
-		clearInterval(interval);
-		let winimage = document.createElement("img");
-		winimage.src = "win.jpg";
-	   // let h3 = document.createElement("h3");
-	   // h3.innerHTML = "YOU WON!!!";
-		endscreen.appendChild(winimage);
-		return;
+	//
+	clearInterval(interval);
+	let winimage = document.createElement("img");
+	let stats = document.createElement("h3");
+	stats.innerHTML = "You solved the puzzle in " + elapsed + " seconds with " + moves + " moves!";
+
+	winimage.src = "win.jpg";
+	endscreen.appendChild(winimage);
+	endscreen.appendChild(stats);
+	return;
 	
-	}
-	//lose
-	else{
-	   // let h3 = document.createElement("h3");
-		let loseimage = document.createElement("img");
-		loseimage.src = "lose.png";
-	   // h3.innerHTML = "YOU LOST";
-	   // endscreen.appendChild(h3);
-		endscreen.appendChild(loseimage);
-		return;
-	}
 }
+let elapsed = null;
+
 function countdown(length){
 	if(length === "quit"){
 	 clearInterval(interval);
-		 return;
+		 return length;
 	 }
-	 //let length = 5;
+	 	let unit = " second";
 		 interval = setInterval(function() {
-		 timer.innerHTML = "Time Remaining: " + String(length);
-		 length -= 1;
-		 if (length < 0) {
-		   clearInterval(interval);
-			 results('L');
-		 }
+		 timer.innerHTML = "Time Elapsed: " + String(length) + unit;
+		 length += 1;
+		 //Updates global variable
+		 elapsed = length;
+		 unit = " seconds";
 	   }, 1000);
 	   return;
 	}
@@ -100,7 +131,9 @@ function restart(){
 	endscreen.classList.remove("final");
 	endscreen.innerHTML = "";
 	countdown("quit");
-
+	reset_puzzle();
+	movetracker.innerHTML = "";
+	moves = 0;
 
 }
 // Show the tiles in the initial (solved) state.
@@ -145,6 +178,7 @@ function reset_puzzle() {
 
 // Move the tile to the blank space.
 function move_tile(tile) {
+
 	const tile_id = tile.id.split("-");
 	if (!shuffling) {
 		// Do not move the tile if the puzzle is not clickable.
@@ -158,6 +192,11 @@ function move_tile(tile) {
 		const to_y = blank_y;
 		// Make the puzzle not clickable during the animation.
 		clickable = false;
+		totalmoves(1);
+		//Checks if cheating is active, to reduce redundancy.
+		if(!cheating){
+		cheatstack.push(tile);
+		}
 		// Move the tile with animation.
 		let pos = 0;
 		const id = setInterval(function() {
@@ -223,7 +262,7 @@ function shuffle_puzzle() {
 	reset_puzzle();
 	shuffling = true;
 	// Move a random tile N times.
-	const N = 1000;
+	const N = 100;
 	for (let i = 0; i < N; i++) {
 		// Get the ids of all adjacent tiles.
 		get_adjacent_tiles();
@@ -231,7 +270,10 @@ function shuffle_puzzle() {
 		const random_index = Math.floor(Math.random() * adjacent_tiles.length);
 		const tile_id = adjacent_tiles[random_index];
 		const tile = document.getElementById(tile_id);
+		cheatstack.push(tile);
+
 		move_tile(tile);
+
 	}
 	shuffling = false;
 	// Make the puzzle clickable.
