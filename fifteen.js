@@ -39,6 +39,7 @@ reset_puzzle();
 
 function start(){
 	cheating = 0;
+	cheatstack = []
 	puzzle.style.display = "block";
 	restart();
 	if(in_progress){
@@ -50,7 +51,7 @@ function start(){
 		countdown(1);
 		song.play();
 		totalmoves("start");
-	},3000);
+	},2);
 	in_progress = 1;
 
 }
@@ -64,7 +65,7 @@ function cheat(){
 		move_tile(j);
 		prev = j;
 	},
-	300 * i);
+	100 * i);
 	}
 		
 }
@@ -87,7 +88,6 @@ function results(){
 		return;
 	}
 	displayed = 1;
-	puzzle.style.display = "none";
 	clickable = false;
 	//Stops song
 	song.pause();
@@ -211,7 +211,7 @@ function move_tile(tile) {
 				tile.style.top = ((100 - pos) * from_y) + (pos * to_y) + "px";
 			}
 		// Each frame lasts for 10 milliseconds.
-		}, 10);
+		}, 5);
 	} else {
 		// Move the tile without animation.
 		tile.style.left = (100 * blank_x) + "px";
@@ -262,7 +262,7 @@ function shuffle_puzzle() {
 	reset_puzzle();
 	shuffling = true;
 	// Move a random tile N times.
-	const N = 100;
+	const N = 300;
 	for (let i = 0; i < N; i++) {
 		// Get the ids of all adjacent tiles.
 		get_adjacent_tiles();
