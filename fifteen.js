@@ -1,141 +1,131 @@
-// Get the "puzzle" div.
+// Get the document elements.
 const puzzle = document.getElementById("puzzle");
+const song = document.getElementById("song");
+const timer = document.getElementById("timer");
+const movetracker = document.getElementById("movetracker");
+const endscreen = document.getElementById("end");
 
 // Configure the "Shuffle" button.
-//const shuffle = document.getElementById("shuffle");
-//shuffle.addEventListener("click", function() {start()});
+const shuffle = document.getElementById("shuffle");
+shuffle.addEventListener("click", function() {start()});
 
 // Configure the "Reset" button.
 const reset = document.getElementById("reset");
-reset.addEventListener("click", function() {restart()});
+reset.addEventListener("click", function() {location.reload()});
+
+// Configure the "Cheat" button.
+const cheat_button = document.getElementById("cheat");
 
 // Track the blank space with x and y positions.
-let blank_x;
-let blank_y;
+let blank_x, blank_y;
 // Track whether the puzzle can be clicked using a boolean value.
 let clickable;
 // Track whether the puzzle is being shuffled using a boolean value.
 let shuffling;
 // Track the adjacent tiles as an array of ids.
 let adjacent_tiles;
-//Flag for whether game is in progress or not
+// Flag for whether game is in progress or not
 let in_progress = 0;
-//Variable for audio element
-let song = document.getElementById("song");
-let timer = document.getElementById("timer");
-//Interval for timer
+let elapsed = null;
+// Interval for timer
 let interval = null;
-let endscreen = document.getElementById("end");
+// Track the number of moves and the tiles that were moved.
 let moves = 0;
 let cheatstack = [];
-let movetracker = document.getElementById("movetracker");
+// Track whether the puzzle is being auto-solved.
+let cheating = 0;
 
-
-
-// Show the puzzle.
+// Display the solved puzzle.
 reset_puzzle();
 
-
-
-function start(){
+// Start the game.
+function start() {
 	cheating = 0;
 	cheatstack = []
-	puzzle.style.display = "block";
-	restart();
-	if(in_progress){
-		return;
-	}
-	//Delays start of game by three seconds
-	setTimeout(function(){
+	if (in_progress) return;
+	// Delays start of game by three seconds
+	setTimeout(function() {
 		shuffle_puzzle();
 		countdown(1);
 		song.play();
 		totalmoves("start");
-	},2);
+	}, 2);
 	in_progress = 1;
-
 }
-let cheating = 0;
-function cheat(){
+
+// Auto-solve the puzzle by doing the reverse of every move.
+function cheat() {
+	cheat_button.disabled = true;
 	cheating = 1;
-	let prev = 0;
-	for(let i = 0; i < cheatstack.length;i++){
-	setTimeout(function(){
-		j = cheatstack.pop();
-		move_tile(j);
-		prev = j;
-	},
-	130 * i);
+	// Delete some redundant tile movements from the stack.
+	for (let i = 1; i <= 5; i++) {
+		let j = 0;
+		while (j < cheatstack.length - 1) {
+			const curr_tile = cheatstack[j];
+			const next_tile = cheatstack[j + 1];
+			if  (curr_tile == next_tile) {
+				cheatstack.splice(j, 2);
+			} else j++;
+		}
 	}
-		
+	// Implement the tile movements in the stack.
+	for (let i = 0; i < cheatstack.length; i++) {
+		setTimeout(function() {
+			move_tile(cheatstack.pop());
+		},
+		130 * i);
+	}
 }
-function totalmoves(parameter){
-	if(parameter == "start"){
 
-	movetracker.innerHTML = "Moves Made: " + String(moves);
+// Display the number of tiles moved.
+function totalmoves(parameter) {
+	if (parameter == "start") movetracker.innerHTML = "Moves Made: " + String(moves);
+	else {
+		moves += parameter;
+		movetracker.innerHTML = "Moves Made: " + String(moves);
 	}
-
-	else{
-	moves += parameter;
-	movetracker.innerHTML = "Moves Made: " + String(moves);
-	}
-
 }
-//End Screen function
+
+// Display the end screen when the puzzle is solved.
 let displayed = 0;
-function results(){
+function results() {
 	if(displayed == 1){
 		return;
 	}
 	displayed = 1;
 	clickable = false;
-	//Stops song
+	// Stops song
 	song.pause();
 	song.currentTime = 0;
-	//Adds the 'final' css class
+	// Adds the 'final' css class
 	endscreen.classList.add("final");
-	//
 	clearInterval(interval);
 	let winimage = document.createElement("img");
 	let stats = document.createElement("h3");
 	stats.innerHTML = "You solved the puzzle in " + elapsed + " seconds with " + moves + " moves!";
-
 	winimage.src = "win.jpg";
 	endscreen.appendChild(winimage);
 	endscreen.appendChild(stats);
 	return;
-	
 }
-let elapsed = null;
 
+// Display a timer.
 function countdown(length){
-	if(length === "quit"){
-	 clearInterval(interval);
+	if (length === "quit"){
+	 	clearInterval(interval);
 		 return length;
-	 }
-	 	let unit = " second";
-		 interval = setInterval(function() {
-		 timer.innerHTML = "Time Elapsed: " + String(length) + unit;
-		 length += 1;
-		 //Updates global variable
-		 elapsed = length;
-		 unit = " seconds";
-	   }, 1000);
-	   return;
 	}
-function restart(){
-	in_progress = 0;
-	song.pause();
-	song.currentTime = 0;
-	timer.innerHTML = "";
-	endscreen.classList.remove("final");
-	endscreen.innerHTML = "";
-	countdown("quit");
-	reset_puzzle();
-	movetracker.innerHTML = "";
-	moves = 0;
-
+	let unit = " second";
+	interval = setInterval(function() {
+		timer.innerHTML = "Time Elapsed: " + String(length) + unit;
+		length += 1;
+		// Updates global variable
+		elapsed = length;
+		unit = " seconds";
+	}, 1000);
+	return;
 }
+
 // Show the tiles in the initial (solved) state.
 function reset_puzzle() {
 	// Clear any existing tiles.
@@ -167,6 +157,8 @@ function reset_puzzle() {
 			set_background(tile);
 			// Add the tile to the puzzle.
 			puzzle.append(tile);
+			// Make the "Cheat" button inactive until the puzzle is shuffled.
+			cheat_button.disabled = true;
 		}
 	}
 	// Set the initial position of the blank space to the bottom right corner.
@@ -178,7 +170,6 @@ function reset_puzzle() {
 
 // Move the tile to the blank space.
 function move_tile(tile) {
-
 	const tile_id = tile.id.split("-");
 	if (!shuffling) {
 		// Do not move the tile if the puzzle is not clickable.
@@ -193,10 +184,8 @@ function move_tile(tile) {
 		// Make the puzzle not clickable during the animation.
 		clickable = false;
 		totalmoves(1);
-		//Checks if cheating is active, to reduce redundancy.
-		if(!cheating){
-		cheatstack.push(tile);
-		}
+		// Checks if cheating is active, to reduce redundancy.
+		if(!cheating) cheatstack.push(tile);
 		// Move the tile with animation.
 		let pos = 0;
 		const id = setInterval(function() {
@@ -271,14 +260,14 @@ function shuffle_puzzle() {
 		const tile_id = adjacent_tiles[random_index];
 		const tile = document.getElementById(tile_id);
 		cheatstack.push(tile);
-
 		move_tile(tile);
-
 	}
 	shuffling = false;
 	// Make the puzzle clickable.
 	set_movable_tiles();
 	clickable = true;
+	cheat_button.disabled = false;
+	shuffle.disabled = true;
 }
 
 // Check whether the puzzle is solved.
@@ -295,7 +284,6 @@ function check_puzzle() {
 		}
 	}
 	// If the check passed, the puzzle is solved.
-	reset_puzzle();
 	results("W");
 }
 
